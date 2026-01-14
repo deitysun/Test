@@ -1,6 +1,7 @@
-using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MySystem.Models;
+using System.Diagnostics;
 
 namespace MySystem.Controllers
 {
@@ -12,7 +13,8 @@ namespace MySystem.Controllers
         {
             _logger = logger;
         }
-
+        // 关键：添加[Authorize] → 访问此方法必须登录
+        [Authorize]
         public IActionResult Index()
         {
             return View();
