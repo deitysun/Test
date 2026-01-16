@@ -1,0 +1,72 @@
+﻿@model StockTenDayLineWarning.Models.ViewModels.StockIndexViewModel
+
+@{
+    {
+        ViewData["Title"] = "股票10日线战法+量价配合量化预警系统";
+        // 忽略Scripts节，解决未渲染异常（仅当前视图生效）
+        IgnoreSection("Scripts");
+    }
+}
+
+<!-- 原有视图内容（卡片、表单等）保持不变 -->
+<!-- ... 此处省略原有HTML代码 ... -->
+<!-- 关键：添加Scripts节，存放当前视图专属JS脚本，解决未渲染节异常 -->
+@section Scripts {
+    <!-- 引入ECharts CDN（也可放在布局页，此处仅演示视图专属脚本） -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+
+    <!-- ECharts图表初始化脚本 -->
+    <script>
+        var myChart = echarts.init(document.getElementById('stockChart'));
+        var dateArr = [];
+        var priceArr = [];
+        var tenDayArr = [];
+        var klineData = [];
+
+        @foreach (var quote in Model.RecentStockQuotes)
+        {
+                @:dateArr.push('@quote.TradeDate.ToString("MM-dd")');
+                @:priceArr.push(@quote.ClosePrice);
+                @:tenDayArr.push(@(quote.TenDayAverage.HasValue? quote.TenDayAverage.Value : 0));
+                @:klineData.push([@quote.OpenPrice, @quote.HighPrice, @quote.LowPrice, @quote.ClosePrice]);
+        }
+
+        var option = {
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: { type: 'cross' },
+                formatter: function (params) {
+                    var res = params[0].name;
+                    res += '<br/>开盘：' + params[0].data[0] + ' 最高：' + params[0].data[1];
+                    res += '<br/>最低：' + params[0].data[2] + ' 收盘：' + params[0].data[3];
+                    res += '<br/>10日线：' + tenDayArr[params[0].dataIndex];
+                    return res;
+                }
+            },
+            legend: { data: ['收盘价', '10日均线', 'K线'], top: 0 },
+            xAxis: { type: 'category', data: dateArr, axisLabel: { rotate: 30 } },
+            yAxis: { type: 'value', scale: true, precision: 2 },
+            series: [
+                {
+                    name: 'K线',
+                    type: 'candlestick',
+                    data: klineData,
+                    itemStyle: {
+                        color: '#ef232a',
+                        color0: '#14b143',
+                        borderColor: '#ef232a',
+                        borderColor0: '#14b143'
+                    }
+                },
+                { name: '收盘价', type: 'line', data: priceArr, lineStyle: { width: 2 }, color: '#1e88e5', showSymbol: false },
+                { name: '10日均线', type: 'line', data: tenDayArr, lineStyle: { width: 3, type: 'dashed' }, color: '#ff9800', showSymbol: false }
+            ],
+            grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true }
+        };
+
+        myChart.setOption(option);
+        window.addEventListener('resize', function () {
+            myChart.resize();
+        });
+    </script>
+}

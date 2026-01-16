@@ -1,0 +1,53 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - 股票10日线量化预警系统</title>
+    <!-- 引入Bootstrap（保持样式统一） -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Identity导航栏（登录/注销/注册） -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+        <div class="container">
+            <a class="navbar-brand" asp-action="Index" asp-controller="Home">股票10日线量化预警系统</a>
+            <div class="navbar-nav ms-auto">
+                @* 未登录：显示注册/登录链接 *@
+                @if (!User.Identity.IsAuthenticated)
+                {
+                    <a class="nav-link" asp-page="/Account/Register">注册</a>
+                    <a class="nav-link" asp-page="/Account/Login">登录</a>
+                }
+                else
+                {
+                    @* 已登录：显示用户名+注销链接 *@
+                    <span class="nav-link text-light">欢迎：@User.Identity.Name</span>
+                    <a class="nav-link" asp-page="/Account/Logout">注销</a>
+                }
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        @* 显示身份验证相关提示信息 *@
+        @if (TempData["Message"] != null)
+        {
+            <div class="alert alert-info mb-3">@TempData["Message"]</div>
+        }
+        @RenderBody()
+    </div>
+
+    <!-- 原有底部内容保留 -->
+    <footer class="text-center mt-5 text-muted">
+        <p>© @DateTime.Now.Year 股票10日线战法+量价配合量化预警系统（VS2022 LocalDB + Identity身份验证）</p>
+    </footer>
+
+    <!-- 引入Bootstrap JS（全局脚本，保留） -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- 关键修改：将Scripts节设置为非必填，解决未渲染异常（全局生效） -->
+    @RenderSection("Scripts", required: false)
+
+</body>
+</html>

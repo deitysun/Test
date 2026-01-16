@@ -45,14 +45,15 @@ if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
 }
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
 // 4. 启用认证中间件（必须在UseRouting之后，UseAuthorization之前）
 app.UseAuthentication();
 app.UseAuthorization();
-
+// 3. 映射 Razor 页面（Identity 登录页是 Razor Page，必须添加此配置）
+app.MapRazorPages();
 app.UseEndpoints(endpoints =>
 {
     // ① 配置 Area 传统路由（必须包含 {area} 占位符）
